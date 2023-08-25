@@ -4,6 +4,7 @@ import { signIn, useSession } from "next-auth/react"
 import { authentication } from "@/settings/firebase.setting"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import { useRouter } from "next/router"
+import  Link from "next/link"
 
 const validationRules = yup.object().shape({
     email:yup.string().required('this field is compulsory'),
@@ -57,7 +58,7 @@ export default function Signup() {
                     <input 
                     id="password"
                     type="password" 
-                    value={values.pasword}
+                    value={values.password}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Password"
@@ -74,8 +75,11 @@ export default function Signup() {
                     placeholder="Confirm Password"
                     className="py-3 sm:py-5 px-2 border border-indigo-400 rounded-lg bg-white/60"
                     />
-                    <button type="submit" className="max-w-[160px] h-12 bg-indigo-800 rounded-lg text-white font-bold"
+                        <Link href="/pages/auth/signin.js">
+                            <button type="submit" className="max-w-[160px] h-12 bg-indigo-800 rounded-lg text-white font-bold"
                     >Create Account</button>
+                        </Link>
+                        
                 </form>
         
                 <div className="w-full grid grid-cols-3 gap-3">
@@ -83,7 +87,7 @@ export default function Signup() {
                     onClick={() => signIn("google")}>Google</button>
                     <button className="w-full h-12 bg-gray-800 rounded-lg text-white font-bold"
                     onClick={() => signIn("github")}>Github</button>
-                    <button className="w-full h-12 bg-sky-600 rounded-lg text-white font-bold">Twitter</button>
+                    <button className=" w-full h-12 bg-sky-600 rounded-lg text-white font-bold">Twitter</button>
                 </div>
             </div>
         </main>

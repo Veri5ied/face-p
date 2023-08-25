@@ -53,7 +53,7 @@ export default function Signin() {
                     <button className="w-full h-12 bg-sky-600 rounded-lg text-white font-bold">Twitter</button>
                 </div>
         
-                <p className="text-2xl text-gray-800">New to facepal? <Link href="#" className="underline">create account</Link></p>
+                <p className="text-2xl text-gray-800">New to facepal? <Link to="./signup.js" className="underline">create account</Link></p>
             </div>
         </main>
         </>
