@@ -75,10 +75,10 @@ export default function Signup() {
                     placeholder="Confirm Password"
                     className="py-3 sm:py-5 px-2 border border-indigo-400 rounded-lg bg-white/60"
                     />
-                        <Link href="/pages/auth/signin.js">
+                        
                             <button type="submit" className="max-w-[160px] h-12 bg-indigo-800 rounded-lg text-white font-bold"
-                    >Create Account</button>
-                        </Link>
+                        ><Link href="./signin.js"> Create Account </Link></button>
+
                         
                 </form>
         
