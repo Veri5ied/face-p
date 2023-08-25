@@ -7,16 +7,6 @@ import PostDisplay from '@/components/PostDisplay';
 import { db } from '@/settings/firebase.setting';
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore'
 import {CustomDialog} from '@/components/CustomDialog'
-import React from 'react'
-import Image from 'next/image'
-import { GoSignOut } from 'react-icons/go';
-import { useSession, signOut } from 'next-auth/react';
-import { useRouter } from 'next/router';
-import PostDisplay from '@/components/PostDisplay';
-import { db } from '@/settings/firebase.setting';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore'
-
-
 
 export default function () {
     const { data: session } = useSession();
