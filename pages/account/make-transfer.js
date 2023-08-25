@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import {TextField,Button} from '@mui/material';
-import { PastTransaction } from '../../components/PastTransaction';
+// import { PastTransaction } from '../../components/PastTransaction';
 
 export default function MakeTransfer() {
     return (
