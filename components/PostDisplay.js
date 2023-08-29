@@ -11,15 +11,15 @@ import MenuItem from '@mui/material/MenuItem';
 import {Button} from '@mui/material'
 import CustomDialog from './CustomDialog';
 import {db} from '@/settings/firebase.setting'
-import { doc, deleteDoc, updateDoc } from 'firebase/firestore'
+import { doc, deleteDoc, updateDoc, getDoc } from 'firebase/firestore'
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
 import TextField from '@mui/material/TextField';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 import { useState } from 'react';
+import ActivityIndicator from '@/utils/activity-indicator';
 
 
 const style = {
@@ -40,6 +40,7 @@ const style = {
 export default function PostDisplay({ postID, timePosted, body, postImage }) {
     
     const { data: session } = useSession();
+    const [showActivityIndicator,setShowActivityIndicator]= React.useState(false)
 
         //Handles Menu Control >>>> Start
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -54,6 +55,12 @@ export default function PostDisplay({ postID, timePosted, body, postImage }) {
     const handleCloseDialogBox = () => setOpenDialogBox(false)
         //Handles DIALOG Control >>>> End
     
+    //Handles DIALOG Control >>>> Start
+    const [openDialogUpdate, setOpenDialogUpdate] = React.useState(false);
+    const handleClickOpenDialogUpdate = () => setOpenDialogUpdate(true)
+    const handleCloseDialogUpdate = () => setOpenDialogUpdate(false)
+        //Handles DIALOG Control >>>> End
+        
         /////Function for Modal
     const [openModal, setOpenModal] = React.useState(false);
     const handleOpenModal = () => setOpenModal(true);
@@ -67,43 +74,39 @@ export default function PostDisplay({ postID, timePosted, body, postImage }) {
             .then(() => alert('post deleted'))
             .catch(e => console.error(e))
     }
-    // const handleDeletePost = async () => {
-    //     await deleteDoc(doc(db, 'posts', postID))
-    //         .then(() => alert('post deleted'))
-    //         .catch(e => alert('post deletion failed'))
-    // }
-
+   
     //State change for updating val :""
-const [updateValue, setUpdateValue] = useState({
-    body
-});
-    // FUNCTION FOR UPDATE POST
-     const handleUpdatePost = async () => {
-        await updateDoc(doc, (db, 'posts', postID, {body:updatePost}))
-            .then(() => alert('updated'))
-            .catch(alert('not updated'))
-    }
-    //     //handlee change update
-    // const handleChangeUpdate = (body) => (e) => {
-    //     e.preventDefault();
-    //     setUpdateValue({ ...updateValue, [body]: e.target.value})
-    // }
-    // // const
-    // //FUNCTION FOR UPDATE POST
-    // const updateDocc = () => {
-    //     db.collection('posts').doc(data.id).update({
-    //         body: {updateValue}
-    //     }).then(() => {
-    //         alert("Updated Successfully");
-    //     }).catch(()=> alert("Update failed"))
-    // } 
+    const [updateValue, setUpdateValue] = useState(body);
+    // const [updateImage, setUpdateImageValue] = useState(postImage);
 
+    const handleUpdatePost = async () => {
+         handleClickOpenDialogUpdate()//close dialog
+        setShowActivityIndicator(true) //start activity indicator
+        await updateDoc(doc(db, 'posts', postID, {
+            body: updateValue,
+            updatedAt: new Date().getTime(),
+            
+        },
+            {
+                merge: true,
+            }
+        ))
+            .then(() => {
+                setShowActivityIndicator(true)
+                alert('updated')
+            })
+             .catch(error => console.error(error))
+        //  console.log(updateValue);
+    }
+
+    
 
     return (
         <>
-            <Box sx={{ display: 'flex' }}>
+            {showActivityIndicator ? <ActivityIndicator /> : null}
+            {/* <Box sx={{ display: 'flex' }}>
                 <CircularProgress />
-            </Box>
+            </Box> */}
         <div className="border border-gray-100 bg-white rounded-md shadow-md py-4 mb-4">
             <ul className="flex justify-between px-4">
                 <li className="flex flex-row gap-1 items-center">
@@ -182,6 +185,8 @@ const [updateValue, setUpdateValue] = useState({
                 <MenuItem onClick={handleClickOpenDialogBox}>delete</MenuItem>
             </Menu>
 
+            
+            {/* DELETE DIALOG */}
             <CustomDialog
                 openProp={openDialogBox}
                 handleCloseProp={handleCloseDialogBox}
@@ -195,6 +200,20 @@ const [updateValue, setUpdateValue] = useState({
                 </Button>
             </CustomDialog>
 
+
+            {/* UPDATE DIALOG
+            <CustomDialog
+                openProp={openDialogBox}
+                handleCloseProp={handleCloseDialogBox}
+                title='Update Post?'
+            >
+                <p>Confirm Post Deletion</p>
+                <Button variant='outlined'
+                    color='error'
+                    onClick={handleDeletePostt}
+                >Yes, Delete
+                </Button>
+            </CustomDialog> */}
 
             <Modal
                 open={openModal}
@@ -233,6 +252,7 @@ const [updateValue, setUpdateValue] = useState({
                                 fullWidth
                                 id="filled-textarea"
                                 value={updateValue}
+                                onChange={(text) => setUpdateValue(text.target.value)}
                                 
                             />
 
@@ -244,25 +264,14 @@ const [updateValue, setUpdateValue] = useState({
                         variant="outlined"
                         color="success"
                         onClick={handleUpdatePost}
+                        style={{marginTop: 8}}
                     >
                         Update
                     </Button>
                 </Box>
             </Modal>
 
-            {/* <CustomDialog
-                openProp={openDialogBox}
-                handleCloseProp={handleCloseDialogBox}
-                title='Updated Post?'
-            >
-                <p>Edit Post</p>
-                <Button variant='outlined'
-                    color='error'
-                    onClick={handleUpdatePost}
-                >Yes, Edit
-                </Button>
-            </CustomDialog> */}
-        </>
+            </>
         
     )
 }
