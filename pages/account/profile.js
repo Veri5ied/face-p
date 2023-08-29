@@ -10,7 +10,7 @@ import { collection, query, where, getDocs, orderBy } from 'firebase/firestore'
 
 
 
-export default function () {
+export default function Profile() {
     const { data: session } = useSession();
     const router = useRouter();
     const [userPosts, setUserPosts] = React.useState([]);
@@ -20,7 +20,7 @@ export default function () {
     const handleGetUserPost = async () => {
         const q = query(
             collection(db, 'posts'),
-            where('author', '==', `${ session?.user.email }`),
+            where('author', '==', `${session?.user.email}`),
             orderBy('postedAt', 'desc')
         );
         const onSnapShot = await getDocs(q);
@@ -119,7 +119,7 @@ export default function () {
 //     const handleGetUserPosts = async () => {
 //         const q = query(
 //             collection(db, 'posts'),
-//             where('author', '==', session.user.email),
+//             where('author', '==', session.user.email), 
 //             orderBy('postedAt', 'desc')
 //         );
 //         const onSnapShot = await getDocs(q);
