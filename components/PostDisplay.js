@@ -1,3 +1,4 @@
+import * as React from 'react'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
@@ -5,14 +6,104 @@ import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineR
 import PublicIcon from '@mui/icons-material/Public';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { hoursAgo } from '@/assets/hours-ago';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import {Button} from '@mui/material'
+import CustomDialog from './CustomDialog';
+import {db} from '@/settings/firebase.setting'
+import { doc, deleteDoc, updateDoc } from 'firebase/firestore'
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
+import TextField from '@mui/material/TextField';
+import Skeleton from '@mui/material/Skeleton';
+import Stack from '@mui/material/Stack';
+import { useState } from 'react';
+
+
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
 
 
 
 
-export default function PostDisplay({ timePosted, body, postImage }) {
+export default function PostDisplay({ postID, timePosted, body, postImage }) {
+    
     const { data: session } = useSession();
 
+        //Handles Menu Control >>>> Start
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => setAnchorEl(event.currentTarget);
+    const handleClose = () => setAnchorEl(null);
+        //Handles Menu Control >>>> END
+
+        //Handles DIALOG Control >>>> Start
+    const [openDialogBox, setOpenDialogBox] = React.useState(false);
+    const handleClickOpenDialogBox = () => setOpenDialogBox(true)
+    const handleCloseDialogBox = () => setOpenDialogBox(false)
+        //Handles DIALOG Control >>>> End
+    
+        /////Function for Modal
+    const [openModal, setOpenModal] = React.useState(false);
+    const handleOpenModal = () => setOpenModal(true);
+    const handleCloseModal = () => setOpenModal(false);
+        
+    
+    //FUNCTION FOR DELETE POST
+
+    const handleDeletePostt = async () => {
+        await deleteDoc(doc(db, 'posts', postID))
+            .then(() => alert('post deleted'))
+            .catch(e => console.error(e))
+    }
+    // const handleDeletePost = async () => {
+    //     await deleteDoc(doc(db, 'posts', postID))
+    //         .then(() => alert('post deleted'))
+    //         .catch(e => alert('post deletion failed'))
+    // }
+
+    //State change for updating val :""
+const [updateValue, setUpdateValue] = useState({
+    body
+});
+    // FUNCTION FOR UPDATE POST
+     const handleUpdatePost = async () => {
+        await updateDoc(doc, (db, 'posts', postID, {body:updatePost}))
+            .then(() => alert('updated'))
+            .catch(alert('not updated'))
+    }
+    //     //handlee change update
+    // const handleChangeUpdate = (body) => (e) => {
+    //     e.preventDefault();
+    //     setUpdateValue({ ...updateValue, [body]: e.target.value})
+    // }
+    // // const
+    // //FUNCTION FOR UPDATE POST
+    // const updateDocc = () => {
+    //     db.collection('posts').doc(data.id).update({
+    //         body: {updateValue}
+    //     }).then(() => {
+    //         alert("Updated Successfully");
+    //     }).catch(()=> alert("Update failed"))
+    // } 
+
+
     return (
+        <>
+            <Box sx={{ display: 'flex' }}>
+                <CircularProgress />
+            </Box>
         <div className="border border-gray-100 bg-white rounded-md shadow-md py-4 mb-4">
             <ul className="flex justify-between px-4">
                 <li className="flex flex-row gap-1 items-center">
@@ -32,7 +123,9 @@ export default function PostDisplay({ timePosted, body, postImage }) {
                 <li>
                     <div className="text-gray-700">
                         <button className='p-2 hover:bg-gray-200 rounded-full'>
-                            <MoreHorizIcon />
+                            <MoreHorizIcon  
+                            onClick={handleClick}
+                                />
                         </button>
                     </div>
                 </li>
@@ -67,7 +160,110 @@ export default function PostDisplay({ timePosted, body, postImage }) {
                     Comment
                 </button>
             </div>
-        </div>
+            </div>
+
+            {/* //Position it anywhere irrespective of position  */}
+            <Menu
+                id="demo-positioned-menu"
+                aria-labelledby="demo-positioned-button"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                }}
+            >
+                <MenuItem onClick={handleOpenModal}>Update</MenuItem>
+                <MenuItem onClick={handleClickOpenDialogBox}>delete</MenuItem>
+            </Menu>
+
+            <CustomDialog
+                openProp={openDialogBox}
+                handleCloseProp={handleCloseDialogBox}
+                title='Delete Post?'
+            >
+                <p>Confirm Post Deletion</p>
+                <Button variant='outlined'
+                    color='error'
+                    onClick={handleDeletePostt}
+                >Yes, Delete
+                </Button>
+            </CustomDialog>
+
+
+            <Modal
+                open={openModal}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        Edit Post
+                    </Typography>
+                    <Typography
+                        id="modal-modal-description"
+                        
+                        sx={{ mt: 2 }}>
+                        <div className='flex flex-row justify-start gap-3'>
+                            <Image
+                                className="rounded-full"
+                                width={28}
+                                height={28}
+                                src={session?.user.image}
+                                alt="profile photo" />
+                            
+                            <p className="text-gray-700 font-semibold">{session?.user.name}</p>
+
+
+                            
+                        </div>
+                        <div>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                multiline
+                                maxRows={4}
+                                type="text"
+                                fullWidth
+                                id="filled-textarea"
+                                value={updateValue}
+                                
+                            />
+
+                            
+                        </div>
+                        
+                    </Typography>
+                    <Button
+                        variant="outlined"
+                        color="success"
+                        onClick={handleUpdatePost}
+                    >
+                        Update
+                    </Button>
+                </Box>
+            </Modal>
+
+            {/* <CustomDialog
+                openProp={openDialogBox}
+                handleCloseProp={handleCloseDialogBox}
+                title='Updated Post?'
+            >
+                <p>Edit Post</p>
+                <Button variant='outlined'
+                    color='error'
+                    onClick={handleUpdatePost}
+                >Yes, Edit
+                </Button>
+            </CustomDialog> */}
+        </>
+        
     )
 }
 

@@ -6,27 +6,21 @@ import { useRouter } from 'next/router';
 import PostDisplay from '@/components/PostDisplay';
 import { db } from '@/settings/firebase.setting';
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore'
-import {CustomDialog} from '@/components/CustomDialog'
+
+
+
 
 export default function () {
     const { data: session } = useSession();
     const router = useRouter();
     const [userPosts, setUserPosts] = React.useState([]);
 
-    const [open, setOpen] = React.useState(false);
-
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
+ 
 
     const handleGetUserPost = async () => {
         const q = query(
             collection(db, 'posts'),
-            where('author', '==', session.user.email),
+            where('author', '==', `${ session?.user.email }`),
             orderBy('postedAt', 'desc')
         );
         const onSnapShot = await getDocs(q);
@@ -90,9 +84,11 @@ export default function () {
                             userPosts.map(post => (
                                 <div id={post.id}>
                                     <PostDisplay
+                                        postID={post.id}
                                         timePosted={post.data.postedAt}
                                         body={post.data.body}
                                         postImage={post.data.imageUrl} />
+                                    
                                 </div>
                             ))
                         }
