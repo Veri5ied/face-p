@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useState } from 'react';
 import Image from 'next/image'
 import { useSession } from 'next-auth/react';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
@@ -11,6 +12,7 @@ import MenuItem from '@mui/material/MenuItem';
 import {Button} from '@mui/material'
 import CustomDialog from './CustomDialog';
 import {db} from '@/settings/firebase.setting'
+// import db from '@/settings/firebase.setting';
 import { doc, deleteDoc, updateDoc, getDoc } from 'firebase/firestore'
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
