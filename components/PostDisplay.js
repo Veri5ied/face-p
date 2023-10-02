@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { AppContext } from '@/settings/globals';
+
 import Image from 'next/image'
 import { useSession } from 'next-auth/react';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
@@ -20,7 +22,6 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
-import { useState } from 'react';
 import ActivityIndicator from '@/utils/activity-indicator';
 
 
@@ -39,9 +40,21 @@ const style = {
 
 
 
-export default function PostDisplay({ postID, timePosted, body, postImage }) {
+export default function PostDisplay({ postID, timePosted, body, postImage, authorUid }) {
     
-    const { data: session } = useSession();
+    const {data:session} = useSession();
+    
+    const {users} = useContext(AppContext);
+
+
+    const getPostByAuthorInfo = (authorUID) => {
+        const filteredUser = users.filter(item => item.id == authorUid);
+        return {
+            a_name:filteredUser[0].data.name,
+            a_photo:filteredUser[0].data.image
+        }
+    }
+
     const [showActivityIndicator,setShowActivityIndicator]= React.useState(false)
 
         //Handles Menu Control >>>> Start
@@ -114,11 +127,12 @@ export default function PostDisplay({ postID, timePosted, body, postImage }) {
                 <li className="flex flex-row gap-1 items-center">
                     <Image
                         className="rounded-full"
-                        src={session?.user.image}
+                        src={getPostByAuthorInfo().a_photo}
                         width={40} height={40}
                         alt="profile photo" />
                     <div className='flex flex-col'>
-                        <small className="text-gray-800">{session?.user.name}</small>
+                        {/* <small className="text-gray-800">{session?.user.name}</small> */}
+                            <small className="text-gray-800">{getPostByAuthorInfo().a_name}</small>
                         <small className='text-gray-500'>
                             <span>{hoursAgo(timePosted)}hours ago</span>
                             <PublicIcon sx={{ fontSize: 15 }} />

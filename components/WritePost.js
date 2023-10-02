@@ -16,6 +16,7 @@ export default function WritePost() {
     const [formInput, setFormInput] = useState('');
     const [selectedFile, setSelectedFile] = useState(null)
 
+    
     // get image file and convert to base64 string
     const imageToPost = (e) => {
         const reader = new FileReader();

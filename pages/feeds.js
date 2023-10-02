@@ -1,8 +1,5 @@
 
-
-
-
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import Image from 'next/image'
 import Head from 'next/head';
 import Link from 'next/link';
@@ -13,12 +10,14 @@ import WritePost from '@/components/WritePost';
 import { getDocs, collection } from 'firebase/firestore'
 import { db } from '@/settings/firebase.setting';
 import PostDisplay from '@/components/PostDisplay';
+import { AppContext } from '@/settings/globals';
 
 
 export default function Feeds() {
     const { data: session } = useSession();
     const [posts, setPosts] = useState([]);
     const router = useRouter();
+  
 
     React.useEffect(() => {
         if (!session) {

@@ -5,26 +5,63 @@ import { db } from "@/settings/firebase.setting";
 import { getDocs,collection,orderBy,query } from "firebase/firestore";
 import React, { useState } from 'react';
 
+// export async function getStaticProps() {
+//     const partners = [];
+//     const q = query(collection(db,'partners'), orderBy('createdAt', 'desc'));
+//     const onSnapShot = await getDocs(q);
+    
+//     onSnapShot.forEach((doc) => {
+        
+//         partners.push({
+//             id: doc.id,
+//             data: doc.data(),
+
+//         });
+//     }) catch (error) {
+//         console.error('Error fetching data from Firestore:', error);
+//     }
+ 
+//     return {
+//         props: {
+//             allPartners: partners//prop:data
+//         }
+//     }
+// }
+
 export async function getStaticProps() {
-    const [partners, setPartners] = useState([]);
-    const q = query(collection(), orderBy(db, 'partners'), orderBy('createdAt', 'desc'));
-    const onSnapShot = await getDocs(q);
-    setPartners(onSnapShot.docs.map(doc => {
-        return {
-            id: doc.id,
-            data: {
-                ...doc.data()
-            }
-        }
-    }));
+    const partners = [];
+
+    // Create a Firestore query to get documents from the 'partners' collection, ordered by 'createdAt' in descending order
+    const q = query(collection(db, 'partners'), orderBy('createdAt', 'desc'));
+
+    try {
+        // Use 'await' with 'getDocs' to fetch the data from Firestore
+        const snapshot = await getDocs(q);
+
+        // Iterate through the documents in the snapshot and transform them into the desired format
+        snapshot.forEach((doc) => {
+            partners.push({
+                id:doc.id,
+                data:doc.data(),
+
+            });
+            console.log("It worked oooo");
+
+        });
+
+        console.log("It worked");
+    } catch (error) {
+        console.error('Error fetching data from Firestore:', error);
+    }
 
     return {
         props: {
-            allPartners:partners //prop:data
-        }
-    }
+            allPartners: partners,
+        },
+    };
 }
-export default function Partners(allPartners) {
+export default function Partners(allPartners ) {
+    console.log("////Yes", allPartners);
     return (
         <>
             <Head>
@@ -50,7 +87,7 @@ export default function Partners(allPartners) {
                                         width={120}
                                         height={120}
                                         src={`https://images.pexels.com/photos/3762927/pexels-photo-3762927.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2`}
-                                    />
+                                    alt="Company"/>
                                 </div>
 
                                 <Link href='#' className="flex flex-row justify-center gap-2 bg-violet-950 rounded-lg p-4 text-white">
