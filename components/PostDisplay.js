@@ -155,7 +155,7 @@ export default function PostDisplay({
           <li className="flex flex-row gap-1 items-center">
             <Image
               className="rounded-full"
-              src={getPostByAuthorInfo()?.a_photo || "/facepal_logo.png"}
+              src={getPostByAuthorInfo()?.a_photo || "/blank-profile.png"}
               width={40}
               height={40}
               alt="profile photo"
