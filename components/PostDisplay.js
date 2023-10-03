@@ -15,7 +15,14 @@ import { Button } from "@mui/material";
 import CustomDialog from "./CustomDialog";
 import { db } from "@/settings/firebase.setting";
 // import db from '@/settings/firebase.setting';
-import { doc, deleteDoc, updateDoc, getDoc } from "firebase/firestore";
+import {
+  doc,
+  deleteDoc,
+  updateDoc,
+  getDoc,
+  collection,
+  where,
+} from "firebase/firestore";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
@@ -97,7 +104,29 @@ export default function PostDisplay({
   const handleUpdatePost = async () => {
     handleClickOpenDialogUpdate(); //close dialog
     setShowActivityIndicator(true); //start activity indicator
-    await updateDoc(
+    const postQuery = doc(db, "posts", postID); // Reference to a single document
+    const postQuerySnapshot = await getDoc(postQuery);
+
+    if (postQuerySnapshot.exists()) {
+      const postQueryData = postQuerySnapshot.data();
+      //update the post
+      await updateDoc(postQuery, {
+        body: updateValue,
+        updatedAt: new Date().getTime(),
+      })
+        .then(() => {
+          setShowActivityIndicator(false);
+          setOpenDialogUpdate(false);
+          setOpenDialogBox(false);
+          handleClickOpenDialogUpdate();
+          setOpenModal(false);
+          alert("updated");
+        })
+        .catch((error) => console.error(error));
+    } else {
+      console.log("Document does not exist.");
+    }
+    /* await updateDoc(
       doc(
         db,
         "posts",
@@ -116,7 +145,7 @@ export default function PostDisplay({
         alert("updated");
       })
       .catch((error) => console.error(error));
-    setShowActivityIndicator(false);
+    setShowActivityIndicator(false); */
     //  console.log(updateValue);
   };
 
